@@ -1,0 +1,485 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Orbitron:wght@400;500;600;700&display=swap');
+
+@layer base {
+  :root {
+    --background: 260 60% 6%;
+    --foreground: 210 40% 98%;
+    --card: 260 60% 8%;
+    --card-foreground: 210 40% 98%;
+    --popover: 260 60% 8%;
+    --popover-foreground: 210 40% 98%;
+    --primary: 267 75% 64%;
+    --primary-foreground: 210 40% 98%;
+    --secondary: 199 89% 48%;
+    --secondary-foreground: 210 40% 98%;
+    --muted: 260 50% 16%;
+    --muted-foreground: 215 20.2% 65.1%;
+    --accent: 324 85% 66%;
+    --accent-foreground: 210 40% 98%;
+    --destructive: 0 84.2% 60.2%;
+    --destructive-foreground: 210 40% 98%;
+    --border: 260 50% 20%;
+    --input: 260 50% 16%;
+    --ring: 267 75% 64%;
+    --radius: 0.5rem;
+
+    --neon-primary: 267 75% 64%;
+    --neon-secondary: 199 89% 48%;
+    --neon-accent: 324 85% 66%;
+  }
+
+  /* Neon Theme (Default) */
+  .neon {
+    --background: 260 60% 6%;
+    --foreground: 210 40% 98%;
+    --card: 260 60% 8%;
+    --card-foreground: 210 40% 98%;
+    --popover: 260 60% 8%;
+    --popover-foreground: 210 40% 98%;
+    --primary: 267 75% 64%;
+    --primary-foreground: 210 40% 98%;
+    --secondary: 199 89% 48%;
+    --secondary-foreground: 210 40% 98%;
+    --muted: 260 50% 16%;
+    --muted-foreground: 215 20.2% 65.1%;
+    --accent: 324 85% 66%;
+    --accent-foreground: 210 40% 98%;
+    --border: 260 50% 20%;
+    --input: 260 50% 16%;
+    --ring: 267 75% 64%;
+  }
+
+  /* Dark Theme */
+  .dark {
+    --background: 222.2 84% 4.9%;
+    --foreground: 210 40% 98%;
+    --card: 222.2 84% 4.9%;
+    --card-foreground: 210 40% 98%;
+    --popover: 222.2 84% 4.9%;
+    --popover-foreground: 210 40% 98%;
+    --primary: 217.2 32.6% 17.5%;
+    --primary-foreground: 210 40% 98%;
+    --secondary: 217.2 32.6% 17.5%;
+    --secondary-foreground: 210 40% 98%;
+    --muted: 217.2 32.6% 17.5%;
+    --muted-foreground: 215 20.2% 65.1%;
+    --accent: 217.2 32.6% 17.5%;
+    --accent-foreground: 210 40% 98%;
+    --border: 217.2 32.6% 17.5%;
+    --input: 217.2 32.6% 17.5%;
+    --ring: 212.7 26.8% 83.9%;
+  }
+
+  /* Midnight Theme */
+  .midnight {
+    --background: 222 47% 11%;
+    --foreground: 210 40% 98%;
+    --card: 222 47% 11%;
+    --card-foreground: 210 40% 98%;
+    --popover: 222 47% 11%;
+    --popover-foreground: 210 40% 98%;
+    --primary: 217 91% 60%;
+    --primary-foreground: 222 84% 5%;
+    --secondary: 215 27.9% 16.9%;
+    --secondary-foreground: 210 40% 98%;
+    --muted: 215 27.9% 16.9%;
+    --muted-foreground: 217.9 10.6% 64.9%;
+    --accent: 221 83% 53%;
+    --accent-foreground: 210 40% 98%;
+    --border: 215 27.9% 16.9%;
+    --input: 215 27.9% 16.9%;
+    --ring: 217 91% 60%;
+  }
+
+  /* Matrix Theme */
+  .matrix {
+    --background: 120 100% 2%;
+    --foreground: 120 100% 85%;
+    --card: 120 100% 3%;
+    --card-foreground: 120 100% 85%;
+    --popover: 120 100% 3%;
+    --popover-foreground: 120 100% 85%;
+    --primary: 120 100% 40%;
+    --primary-foreground: 120 100% 5%;
+    --secondary: 120 50% 10%;
+    --secondary-foreground: 120 100% 85%;
+    --muted: 120 50% 8%;
+    --muted-foreground: 120 20% 60%;
+    --accent: 120 100% 50%;
+    --accent-foreground: 120 100% 5%;
+    --border: 120 50% 15%;
+    --input: 120 50% 8%;
+    --ring: 120 100% 50%;
+  }
+
+  /* Cyberpunk Theme */
+  .cyberpunk {
+    --background: 300 20% 8%;
+    --foreground: 300 5% 95%;
+    --card: 300 20% 10%;
+    --card-foreground: 300 5% 95%;
+    --popover: 300 20% 10%;
+    --popover-foreground: 300 5% 95%;
+    --primary: 320 100% 60%;
+    --primary-foreground: 300 20% 8%;
+    --secondary: 180 100% 50%;
+    --secondary-foreground: 300 20% 8%;
+    --muted: 300 20% 15%;
+    --muted-foreground: 300 5% 65%;
+    --accent: 280 100% 70%;
+    --accent-foreground: 300 20% 8%;
+    --border: 300 20% 20%;
+    --input: 300 20% 15%;
+    --ring: 320 100% 60%;
+  }
+
+  /* Sunset Theme */
+  .sunset {
+    --background: 25 25% 8%;
+    --foreground: 30 5% 95%;
+    --card: 25 25% 10%;
+    --card-foreground: 30 5% 95%;
+    --popover: 25 25% 10%;
+    --popover-foreground: 30 5% 95%;
+    --primary: 25 95% 53%;
+    --primary-foreground: 25 25% 8%;
+    --secondary: 280 100% 60%;
+    --secondary-foreground: 25 25% 8%;
+    --muted: 25 20% 15%;
+    --muted-foreground: 25 5% 65%;
+    --accent: 45 100% 55%;
+    --accent-foreground: 25 25% 8%;
+    --border: 25 20% 20%;
+    --input: 25 20% 15%;
+    --ring: 25 95% 53%;
+  }
+}
+
+@layer base {
+  * {
+    @apply border-border;
+  }
+  
+  html, body {
+    font-family: 'Inter', sans-serif;
+  }
+  
+  body {
+    @apply bg-background text-foreground;
+    transition: background-color 0.3s ease, color 0.3s ease;
+    background-image: 
+      radial-gradient(circle at top left, hsla(var(--primary), 0.15), transparent 40%),
+      radial-gradient(circle at bottom right, hsla(var(--secondary), 0.15), transparent 40%),
+      radial-gradient(circle at center, hsla(var(--accent), 0.1), transparent 60%);
+    background-attachment: fixed;
+  }
+
+  .dark body {
+    background-image: 
+      radial-gradient(circle at top left, hsla(var(--muted), 0.05), transparent 40%),
+      radial-gradient(circle at bottom right, hsla(var(--muted-foreground), 0.05), transparent 40%);
+    background-attachment: fixed;
+  }
+  
+  h1, h2, h3, .futuristic-text {
+    font-family: 'Orbitron', sans-serif;
+  }
+}
+
+/* Acrylic background effects for all themes */
+.acrylic {
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+  transition: background-color 0.3s ease;
+}
+
+.neon .acrylic {
+  background: rgba(30, 20, 50, 0.6);
+}
+
+.dark .acrylic {
+  background: rgba(20, 20, 20, 0.6);
+}
+
+.midnight .acrylic {
+  background: rgba(15, 23, 42, 0.6);
+}
+
+.matrix .acrylic {
+  background: rgba(0, 20, 0, 0.6);
+}
+
+.cyberpunk .acrylic {
+  background: rgba(30, 15, 30, 0.6);
+}
+
+.sunset .acrylic {
+  background: rgba(40, 25, 15, 0.6);
+}
+
+.acrylic-light {
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
+  transition: background-color 0.3s ease;
+}
+
+.neon .acrylic-light {
+  background: rgba(50, 40, 80, 0.5);
+}
+
+.dark .acrylic-light {
+  background: rgba(40, 40, 40, 0.5);
+}
+
+.midnight .acrylic-light {
+  background: rgba(30, 58, 138, 0.5);
+}
+
+.matrix .acrylic-light {
+  background: rgba(0, 40, 0, 0.5);
+}
+
+.cyberpunk .acrylic-light {
+  background: rgba(50, 25, 50, 0.5);
+}
+
+.sunset .acrylic-light {
+  background: rgba(60, 40, 25, 0.5);
+}
+
+.acrylic-dark {
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  transition: background-color 0.3s ease;
+}
+
+.neon .acrylic-dark {
+  background: rgba(20, 10, 40, 0.8);
+}
+
+.dark .acrylic-dark {
+  background: rgba(10, 10, 10, 0.8);
+}
+
+.midnight .acrylic-dark {
+  background: rgba(15, 23, 42, 0.8);
+}
+
+.matrix .acrylic-dark {
+  background: rgba(0, 15, 0, 0.8);
+}
+
+.cyberpunk .acrylic-dark {
+  background: rgba(20, 10, 20, 0.8);
+}
+
+.sunset .acrylic-dark {
+  background: rgba(30, 20, 10, 0.8);
+}
+
+/* Dynamic glow effects using CSS custom properties */
+.neon-glow {
+  transition: box-shadow 0.3s ease;
+  box-shadow: 0 0 10px 1px hsla(var(--primary), 0.7), 
+              0 0 20px 3px hsla(var(--primary), 0.3);
+}
+
+.neon-glow-secondary {
+  transition: box-shadow 0.3s ease;
+  box-shadow: 0 0 10px 1px hsla(var(--secondary), 0.7), 
+              0 0 20px 3px hsla(var(--secondary), 0.3);
+}
+
+.neon-glow-accent {
+  transition: box-shadow 0.3s ease;
+  box-shadow: 0 0 10px 1px hsla(var(--accent), 0.7), 
+              0 0 20px 3px hsla(var(--accent), 0.3);
+}
+
+/* Fallback for dark theme with reduced intensity */
+.dark .neon-glow,
+.dark .neon-glow-secondary,
+.dark .neon-glow-accent {
+  box-shadow: 0 0 10px 1px hsla(var(--primary), 0.3), 
+              0 0 20px 3px hsla(var(--primary), 0.1);
+}
+
+/* Dynamic text glow effects using CSS custom properties */
+.neon-text {
+  transition: color 0.3s ease, text-shadow 0.3s ease;
+  color: hsl(var(--primary));
+  text-shadow: 0 0 5px hsla(var(--primary), 0.7),
+               0 0 10px hsla(var(--primary), 0.3);
+}
+
+.neon-text-secondary {
+  transition: color 0.3s ease, text-shadow 0.3s ease;
+  color: hsl(var(--secondary));
+  text-shadow: 0 0 5px hsla(var(--secondary), 0.7),
+               0 0 10px hsla(var(--secondary), 0.3);
+}
+
+.neon-text-accent {
+  transition: color 0.3s ease, text-shadow 0.3s ease;
+  color: hsl(var(--accent));
+  text-shadow: 0 0 5px hsla(var(--accent), 0.7),
+               0 0 10px hsla(var(--accent), 0.3);
+}
+
+/* Accent text glow effect */
+.accent-text-glow {
+  color: hsl(var(--accent));
+  text-shadow: 0 0 5px hsla(var(--accent), 0.7),
+               0 0 10px hsla(var(--accent), 0.3),
+               0 0 15px hsla(var(--accent), 0.2);
+}
+
+/* Dark theme fallback - no glow effects */
+.dark .neon-text,
+.dark .neon-text-secondary,
+.dark .neon-text-accent,
+.dark .accent-text-glow {
+  text-shadow: none;
+}
+
+/* Dynamic accent color utilities */
+.accent-glow {
+  box-shadow: 0 0 8px hsla(var(--accent), 0.6), 
+              0 0 16px hsla(var(--accent), 0.3);
+}
+
+.accent-glow-secondary {
+  box-shadow: 0 0 8px hsla(var(--secondary), 0.6), 
+              0 0 16px hsla(var(--secondary), 0.3);
+}
+
+.btn-accent {
+  background: hsl(var(--accent));
+  color: hsl(var(--accent-foreground));
+  border: 1px solid hsl(var(--accent));
+  transition: all 0.3s ease;
+}
+
+.btn-accent:hover {
+  background: hsla(var(--accent), 0.8);
+  box-shadow: 0 0 12px hsla(var(--accent), 0.5);
+}
+
+.btn-accent-outline {
+  background: transparent;
+  color: hsl(var(--accent));
+  border: 1px solid hsl(var(--accent));
+  transition: all 0.3s ease;
+}
+
+.btn-accent-outline:hover {
+  background: hsla(var(--accent), 0.1);
+  box-shadow: 0 0 8px hsla(var(--accent), 0.3);
+}
+
+/* Animations */
+@keyframes pulse-glow {
+  0%, 100% {
+    opacity: 1;
+  }
+  50% {
+    opacity: 0.6;
+  }
+}
+
+@keyframes float {
+  0%, 100% {
+    transform: translateY(0);
+  }
+  50% {
+    transform: translateY(-5px);
+  }
+}
+
+@keyframes border-glow {
+  0%, 100% {
+    border-color: hsl(var(--primary));
+    box-shadow: 0 0 5px hsla(var(--primary), 0.7);
+  }
+  33% {
+    border-color: hsl(var(--secondary));
+    box-shadow: 0 0 5px hsla(var(--secondary), 0.7);
+  }
+  66% {
+    border-color: hsl(var(--accent));
+    box-shadow: 0 0 5px hsla(var(--accent), 0.7);
+  }
+}
+
+.animate-pulse-glow {
+  animation: pulse-glow 2s infinite;
+}
+
+.animate-float {
+  animation: float 3s ease infinite;
+}
+
+.animate-border-glow {
+  animation: border-glow 6s infinite;
+}
+
+/* Button Styles */
+.neon-button {
+  position: relative;
+  overflow: hidden;
+  transition: all 0.3s ease;
+}
+
+.neon-button::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: -100%;
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(
+    90deg,
+    transparent,
+    rgba(255, 255, 255, 0.2),
+    transparent
+  );
+  transition: all 0.6s ease;
+}
+
+.neon-button:hover::before {
+  left: 100%;
+}
+
+/* Custom scrollbar with theme support */
+::-webkit-scrollbar {
+  width: 5px;
+}
+
+::-webkit-scrollbar-track {
+  background: hsla(var(--background), 0.3);
+}
+
+::-webkit-scrollbar-thumb {
+  background: hsla(var(--primary), 0.5);
+  border-radius: 5px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: hsla(var(--primary), 0.7);
+}
+
+/* Force tooltips to appear above everything */
+[data-radix-popper-content-wrapper] {
+  z-index: 9999 !important;
+}
+
+[data-radix-tooltip-content] {
+  z-index: 9999 !important;
+}
+
+[data-radix-tooltip-portal] {
+  z-index: 9999 !important;
+}
