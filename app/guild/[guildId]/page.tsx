@@ -11,6 +11,7 @@ import GuildMembersPanel from "@/components/shell/guild-member-panel"
 import { ServerProvider } from "@/context/server-context"
 import { ChannelProvider } from "@/context/channel-context"
 import { UserProvider } from "@/context/user-context"
+import { VoiceConnectionProvider } from "@/components/voice/voice-connection-provider"
 import AuthCheck from "@/components/auth/auth-check"
 import { redirect } from "next/navigation"
 import { ServerContext } from "@/context/server-context"
@@ -236,29 +237,31 @@ function GuildContent({
       permissions: ["basic"]
     }
   ]
-    return (
-    <div className="flex h-screen bg-surface text-white overflow-hidden">
-      <GuildSidebar />
-      <ChannelSidebar />
-      <MainPanel 
-        toggleNotificationsPanel={toggleNotificationsPanel} 
-        toggleMembersPanel={toggleMembersPanel}
-      />
-      {isNotificationsPanelOpen && (
-        <NotificationsPanel
-          isOpen={true}
-          onClose={() => setIsNotificationsPanelOpen(false)}
+  return (
+    <VoiceConnectionProvider>
+      <div className="flex h-screen bg-surface text-white overflow-hidden">
+        <GuildSidebar />
+        <ChannelSidebar />
+        <MainPanel 
+          toggleNotificationsPanel={toggleNotificationsPanel} 
+          toggleMembersPanel={toggleMembersPanel}
         />
-      )}
-      {isMembersPanelOpen && (
-        <GuildMembersPanel
-          members={mockMembers}
-          roles={mockRoles}
-          isOpen={true}
-          onClose={() => setIsMembersPanelOpen(false)}
-        />
-      )}
-      <UserFooterBar />
-    </div>
+        {isNotificationsPanelOpen && (
+          <NotificationsPanel
+            isOpen={true}
+            onClose={() => setIsNotificationsPanelOpen(false)}
+          />
+        )}
+        {isMembersPanelOpen && (
+          <GuildMembersPanel
+            members={mockMembers}
+            roles={mockRoles}
+            isOpen={true}
+            onClose={() => setIsMembersPanelOpen(false)}
+          />
+        )}
+        <UserFooterBar />
+      </div>
+    </VoiceConnectionProvider>
   )
 }

@@ -104,30 +104,27 @@ export default function UserFooterBar() {
   }
 
   return (
-    <div className="fixed bottom-1 left-0 z-50 pointer-events-none">
-      {/* User Popover */}
+    <div className="fixed bottom-1 left-0 z-50 pointer-events-none">      {/* User Popover */}
       {popoverOpen && (        <div
           ref={popoverRef}
-          className="absolute bottom-16 left-0 ml-5 z-[60] w-80 rounded-2xl bg-card/95 backdrop-blur-xl shadow-2xl border border-primary/30 p-0 pointer-events-auto"
+          className="absolute bottom-16 left-0 ml-5 z-[60] w-80 rounded-2xl bg-card/95 backdrop-blur-xl border border-border/50 p-0 pointer-events-auto"
           style={{
-            boxShadow: "0 16px 64px rgba(0, 0, 0, 0.6), 0 0 0 1px rgba(255, 255, 255, 0.05)",
+            boxShadow: "0 16px 64px rgba(0, 0, 0, 0.3), 0 4px 16px rgba(0, 0, 0, 0.2), 0 0 0 1px rgba(255, 255, 255, 0.05)",
           }}
-        >
-          {/* Banner */}
+        >          {/* Banner */}
           <div 
-            className="h-20 w-full rounded-t-2xl bg-gradient-to-br from-primary/80 via-secondary/60 to-accent/80 relative"
+            className="h-20 w-full rounded-t-2xl bg-gradient-to-br from-primary/70 via-secondary/50 to-accent/70 relative overflow-hidden"
           >
-            <div className="absolute inset-0 bg-black/20 rounded-t-2xl"></div>
+            <div className="absolute inset-0 bg-black/10 rounded-t-2xl"></div>
           </div>
-          
-          {/* Avatar and status */}          <div className="relative flex items-start px-6 -mt-12">            <div className="relative">
-              <Avatar className="w-20 h-20 border-4 border-card ring-2 ring-primary/30">
+            {/* Avatar and status */}          <div className="relative flex items-start px-6 -mt-12">            <div className="relative">
+              <Avatar className="w-20 h-20 border-4 border-card shadow-lg">
                 <AvatarFallback className="bg-gradient-to-br from-primary to-secondary text-primary-foreground text-2xl font-bold">
                   {username.substring(0, 2).toUpperCase()}
                 </AvatarFallback>
               </Avatar>
               <div className={cn(
-                "absolute -bottom-1 -right-1 w-6 h-6 rounded-full border-4 border-card",
+                "absolute -bottom-1 -right-1 w-6 h-6 rounded-full border-4 border-card shadow-sm",
                 getStatusBgColor(userStatus)
               )}></div>
             </div>
@@ -151,10 +148,9 @@ export default function UserFooterBar() {
                 <div className="text-xs text-muted-foreground uppercase font-semibold mb-1">About Me</div>
                 <div className="text-sm text-foreground">{bio}</div>
               </div>
-            )}
-          </div>
+            )}          </div>
             {/* Divider */}
-          <div className="mx-6 mb-3 h-px bg-border/50"></div>
+          <div className="mx-6 mb-3 h-px bg-border"></div>
           
           {/* Status Options */}
           <div className="px-6 mb-3">
@@ -181,10 +177,9 @@ export default function UserFooterBar() {
                   )}
                 </button>
               ))}
-            </div>
-          </div>
+            </div>          </div>
             {/* Divider */}
-          <div className="mx-6 mb-3 h-px bg-border/50"></div>
+          <div className="mx-6 mb-3 h-px bg-border"></div>
           
           {/* Actions */}
           <div className="px-6 pb-6 space-y-2">
@@ -227,31 +222,28 @@ export default function UserFooterBar() {
             </button>
           </div>
         </div>
-      )}
-
-      {/* Footer Bar */}
+      )}      {/* Footer Bar */}
       <div        className={cn(
           "pointer-events-auto",
           "rounded-xl bg-card/95 backdrop-blur-xl",
-          "border border-border/60 shadow-2xl",
+          "border border-border/50 shadow-xl",
           "flex items-center justify-between px-4 py-4",
           "transition-all duration-300 ease-in-out",
-          "hover:shadow-primary/20 hover:border-primary/40",
+          "hover:shadow-primary/10 hover:border-primary/30",
           "min-w-[280px] max-w-[500px] w-[314px] ml-1"
         )}
         style={{
-          boxShadow: "0 8px 32px rgba(0, 0, 0, 0.4), 0 0 0 1px rgba(255, 255, 255, 0.05)",
+          boxShadow: "0 8px 32px rgba(0, 0, 0, 0.2), 0 4px 12px rgba(0, 0, 0, 0.1), 0 0 0 1px rgba(255, 255, 255, 0.05)",
         }}
-      >
-        {/* User Info Section */}        <div className="flex items-center gap-3 min-w-0 flex-1">          <div className="relative">
-            <Avatar className="w-10 h-10 ring-2 ring-border/50">
+      >        {/* User Info Section */}        <div className="flex items-center gap-3 min-w-0 flex-1">          <div className="relative">
+            <Avatar className="w-10 h-10 border-2 border-border/30 shadow-md">
               <AvatarFallback className="bg-gradient-to-br from-primary to-secondary text-primary-foreground text-sm font-semibold">
                 {username.substring(0, 2).toUpperCase()}
               </AvatarFallback>
             </Avatar>
             {/* Status dot with dynamic color */}
             <div className={cn(
-              "absolute -bottom-0.5 -right-0.5 w-3.5 h-3.5 rounded-full border-2 border-card",
+              "absolute -bottom-0.5 -right-0.5 w-3.5 h-3.5 rounded-full border-2 border-card shadow-sm",
               getStatusBgColor(userStatus)
             )}></div>
           </div>

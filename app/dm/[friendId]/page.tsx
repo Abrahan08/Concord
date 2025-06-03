@@ -7,6 +7,7 @@ import DMSidebar from "@/components/direct-messages/dm-sidebar"
 import { ServerProvider } from "@/context/server-context"
 import { ChannelProvider } from "@/context/channel-context"
 import { UserProvider } from "@/context/user-context"
+import { VoiceConnectionProvider } from "@/components/voice/voice-connection-provider"
 import AuthCheck from "@/components/auth/auth-check"
 import { redirect } from "next/navigation"
 import { Input } from "@/components/ui/input"
@@ -348,9 +349,10 @@ export default function DirectMessagePage() {
                             <Users className="h-8 w-8 text-purple-300" />
                           </div>
                           <p className="text-xl font-semibold text-center">Friend not found.</p>                        </div>
-                      </div>                    )}
-                  </div>
-                  <UserFooterBar />
+                      </div>                    )}                </div>
+                  <VoiceConnectionProvider>
+                    <UserFooterBar />
+                  </VoiceConnectionProvider>
                 </div>
 
                 {/* Calling Modal */}

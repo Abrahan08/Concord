@@ -250,28 +250,17 @@ export default function ChannelSidebar() {  const router = useRouter()
                       className={cn(
                         "flex items-center w-full rounded-md py-1 px-2 my-1 text-gray-400 hover:bg-secondary/20 hover:text-white transition-colors",
                         currentChannelId === channel.id && "bg-secondary/30 text-white"
-                      )}
-                      onClick={() => {
+                      )}                      onClick={() => {
+                        // Just set the channel ID without opening voice panel
+                        // Users can manually join voice channels through other means
                         setCurrentChannelId(channel.id)
-                        if (currentUser && !isInChannel) {
-                          joinVoiceChannel(channel.id, currentUser.id)
-                        }
+                        // Removed automatic voice channel joining
                       }}
                     >
                       {getChannelIcon(channel.type)}
                       <span className="truncate">{channel.name}</span>
-                      {channel.private && <Lock className="w-3 h-3 ml-1 opacity-70" />}
-                    </button>
-                    <div className="flex items-center gap-2 mt-1 ml-8">
-                      {currentUser && isInChannel && (
-                        <button
-                          className="text-xs px-2 py-0.5 rounded bg-destructive/20 text-destructive hover:bg-destructive/40 transition-colors"
-                          onClick={() => leaveVoiceChannel(channel.id, currentUser.id)}
-                        >
-                          Leave
-                        </button>
-                      )}
-                    </div>                    {deduplicatedUsers.length > 0 && (
+                      {channel.private && <Lock className="w-3 h-3 ml-1 opacity-70" />}                    </button>
+                    {deduplicatedUsers.length > 0 && (
                       <div className="flex flex-col gap-1 mt-1 ml-8">
                         {deduplicatedUsers.map((user: any) => (
                           <div key={`voice-${channel.id}-${user.id}`} className="flex items-center gap-2">

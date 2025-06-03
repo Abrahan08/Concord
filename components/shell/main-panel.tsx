@@ -59,11 +59,9 @@ export default function MainPanel({ toggleNotificationsPanel, toggleMembersPanel
             </span>
           </button>
         </div>
-      </div>
-
-      {currentChannel.type === "text" && <ChatPanel />}
-      {currentChannel.type === "voice" && <VoicePanel />}
-      {currentChannel.type === "video" && <VideoPanel />}
+      </div>      {currentChannel.type === "text" && <ChatPanel />}
+      {currentChannel.type === "voice" && <ChatPanel />}
+      {currentChannel.type === "video" && <ChatPanel />}
     </div>
   )
 }
