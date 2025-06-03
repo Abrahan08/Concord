@@ -48,17 +48,7 @@ export function ServerProvider({ children }: { children: ReactNode }) {
     {
       id: "4",
       name: "Book Club",
-    },
-  ]
-
-  // Function to reset servers to default (clear icons)
-  const resetServersToDefault = () => {
-    if (typeof window !== 'undefined') {
-      localStorage.removeItem("verdant_servers")
-      localStorage.removeItem("verdant_current_server")
-      setServers(defaultServers)
-    }
-  }
+    },  ]
 
   const [servers, setServers] = useState<Server[]>(() => {
     // Initialize servers from localStorage on first load
@@ -81,7 +71,6 @@ export function ServerProvider({ children }: { children: ReactNode }) {
     // Treat empty string as null
     setCurrentServerId(id ? id : null);
   }
-
   // Initialize localStorage with default servers if none exist (only run once)
   useEffect(() => {
     if (typeof window !== 'undefined') {
@@ -92,17 +81,12 @@ export function ServerProvider({ children }: { children: ReactNode }) {
     }
   }, []) // Only run once on mount
 
-  // One-time reset to ensure all servers show text avatars (remove this after fix)
-  useEffect(() => {
-    resetServersToDefault()
-  }, [])
-
   // Update localStorage whenever servers change
   useEffect(() => {
     if (typeof window !== 'undefined') {
       localStorage.setItem("verdant_servers", JSON.stringify(servers))
-    }
-  }, [servers])
+    }  }, [servers])
+  
   const currentServer = currentServerId ? servers.find((server) => server.id === currentServerId) || null : null
 
   const addServer = (server: Server) => {

@@ -2,6 +2,7 @@
 
 import { createContext, useState, useContext, useEffect, type ReactNode } from "react"
 import { UserContext } from "./user-context"
+import { ServerContext } from "./server-context"
 
 export interface Channel {
   id: string
@@ -54,6 +55,7 @@ export const ChannelContext = createContext<ChannelContextType>({
 
 export function ChannelProvider({ children }: { children: ReactNode }) {
   const { users } = useContext(UserContext)
+  const { servers } = useContext(ServerContext)
 
   // Mock data
   const defaultChannels: Channel[] = [
@@ -129,6 +131,60 @@ export function ChannelProvider({ children }: { children: ReactNode }) {
   const [currentChannelId, setCurrentChannelId] = useState<string | null>("1")
   const [messages, setMessages] = useState<Message[]>([])
   const [voiceChannelUsers, setVoiceChannelUsers] = useState<{ [channelId: string]: string[] }>({})
+
+  // Function to create default channels for a new server
+  const createDefaultChannelsForServer = (serverId: string) => {
+    const serverChannels: Channel[] = [
+      {
+        id: `${serverId}_general`,
+        serverId: serverId,
+        name: "general",
+        type: "text",
+      },
+      {
+        id: `${serverId}_voice`,
+        serverId: serverId,
+        name: "voice-chat",
+        type: "voice",
+      },
+    ]
+    
+    setChannels((prev) => {
+      // Check if channels for this server already exist
+      const existingServerChannels = prev.filter(channel => channel.serverId === serverId)
+      if (existingServerChannels.length > 0) {
+        return prev // Don't create duplicates
+      }
+      
+      const updated = [...prev, ...serverChannels]
+      // Update localStorage immediately
+      localStorage.setItem("verdant_channels", JSON.stringify(updated))
+      return updated
+    })
+    
+    return serverChannels[0] // Return the general channel
+  }
+
+  // Monitor for new servers and create default channels
+  useEffect(() => {
+    if (!servers || servers.length === 0) return
+    
+    servers.forEach(server => {
+      const serverChannels = channels.filter(channel => channel.serverId === server.id)
+      if (serverChannels.length === 0) {
+        // This is a new server without channels, create default ones
+        const generalChannel = createDefaultChannelsForServer(server.id)
+        
+        // Auto-select the general channel if this server is currently selected
+        if (server.id === servers[servers.length - 1]?.id && (!currentChannelId || !channels.find(c => c.id === currentChannelId))) {
+          // This is likely a newly created server, auto-select its general channel
+          setTimeout(() => {
+            setCurrentChannelId(generalChannel.id)
+          }, 100) // Small delay to ensure channels are updated
+        }
+      }
+    })
+  }, [servers, channels])
 
   useEffect(() => {
     // Load channels from localStorage if available

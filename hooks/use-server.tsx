@@ -23,7 +23,7 @@ const ServerFunctionsContext = createContext<ServerContextType>({
 
 export const ServerFunctionsProvider = ({ children }: { children: ReactNode }) => {
   const { toast } = useToast()
-  const createServer = async (data: ServerData) => {
+    const createServer = async (data: ServerData) => {
     // Simulate API call
     await new Promise((resolve) => setTimeout(resolve, 1000))
 

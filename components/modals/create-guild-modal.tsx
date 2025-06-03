@@ -44,9 +44,9 @@ export default function CreateGuildModal({ isOpen, onClose }: CreateGuildModalPr
     })
     onClose()
   }
-  
-  const handleIconChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    if (e.target.files && e.target.files[0]) {      const file = e.target.files[0]
+    const handleIconChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    if (e.target.files && e.target.files[0]) {
+      const file = e.target.files[0]
       const reader = new FileReader()
       reader.onload = (event) => {
         if (event.target?.result) {
@@ -56,12 +56,20 @@ export default function CreateGuildModal({ isOpen, onClose }: CreateGuildModalPr
       reader.readAsDataURL(file)
     }
   }
-    const handleSubmit = async (e: React.FormEvent) => {
+  
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
     setIsLoading(true)
 
     try {
-      const newServer = await createServer(guildData)
+      // Only include icon if it's not the default placeholder
+      const serverData = {
+        name: guildData.name,
+        description: guildData.description,
+        ...(guildData.icon !== "/placeholder.svg?height=200&width=200" && { icon: guildData.icon })
+      }
+      
+      const newServer = await createServer(serverData)
       
       // Add the server to the context so it appears in the sidebar immediately
       addServer(newServer)

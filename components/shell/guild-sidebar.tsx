@@ -75,9 +75,7 @@ export default function GuildSidebar() {
 					</Tooltip>
 				</TooltipProvider>
 
-				<div className="w-8 h-px bg-gradient-to-r from-transparent via-purple-500/50 to-transparent my-2"></div>
-
-				{/* Server Icons */}
+				<div className="w-8 h-px bg-gradient-to-r from-transparent via-purple-500/50 to-transparent my-2"></div>				{/* Server Icons */}
 				{servers.map((server) => (
 					<TooltipProvider key={server.id} delayDuration={300}>
 						<Tooltip>
@@ -185,8 +183,7 @@ export default function GuildSidebar() {
 										<Users className="h-4 w-4" />
 										<span className="text-sm">Members</span>
 									</div>
-								</div>
-							</TooltipContent>
+								</div>							</TooltipContent>
 						</Tooltip>
 					</TooltipProvider>
 				))}
