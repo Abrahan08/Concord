@@ -33,6 +33,9 @@ interface ChannelContextType {
   sendMessage: (message: Omit<Message, "user">) => void
   createChannel: (channel: Omit<Channel, "id">) => Promise<Channel>
   deleteChannel: (channelId: string) => Promise<void>
+  voiceChannelUsers: { [channelId: string]: string[] }
+  joinVoiceChannel: (channelId: string, userId: string) => void
+  leaveVoiceChannel: (channelId: string, userId: string) => void
 }
 
 export const ChannelContext = createContext<ChannelContextType>({
@@ -44,6 +47,9 @@ export const ChannelContext = createContext<ChannelContextType>({
   sendMessage: () => {},
   createChannel: async () => ({ id: "", serverId: "", name: "", type: "text" }),
   deleteChannel: async () => {},
+  voiceChannelUsers: {},
+  joinVoiceChannel: () => {},
+  leaveVoiceChannel: () => {},
 })
 
 export function ChannelProvider({ children }: { children: ReactNode }) {
@@ -89,41 +95,40 @@ export function ChannelProvider({ children }: { children: ReactNode }) {
       type: "text",
     },
   ]
-
   const defaultMessages: Message[] = [
     {
       id: "1",
       channelId: "1",
-      userId: "2",
+      userId: "mock_2",
       content: "Hey everyone! Welcome to Verdant HQ!",
       timestamp: new Date(Date.now() - 3600000 * 24).toISOString(),
     },
     {
       id: "2",
       channelId: "1",
-      userId: "3",
+      userId: "mock_3",
       content: "Thanks for the invite! This UI looks amazing.",
       timestamp: new Date(Date.now() - 3600000 * 12).toISOString(),
     },
     {
       id: "3",
       channelId: "1",
-      userId: "4",
+      userId: "mock_4",
       content: "I love the green theme! Very Matrix-like.",
       timestamp: new Date(Date.now() - 3600000 * 2).toISOString(),
     },
     {
       id: "4",
       channelId: "1",
-      userId: "1",
+      userId: "mock_1",
       content: "Let's schedule a video call to discuss the new project.",
       timestamp: new Date(Date.now() - 3600000).toISOString(),
     },
   ]
-
   const [channels, setChannels] = useState<Channel[]>(defaultChannels)
   const [currentChannelId, setCurrentChannelId] = useState<string | null>("1")
   const [messages, setMessages] = useState<Message[]>([])
+  const [voiceChannelUsers, setVoiceChannelUsers] = useState<{ [channelId: string]: string[] }>({})
 
   useEffect(() => {
     // Load channels from localStorage if available
@@ -133,6 +138,25 @@ export function ChannelProvider({ children }: { children: ReactNode }) {
     } else {
       // Initialize with default channels if none exist
       localStorage.setItem("verdant_channels", JSON.stringify(defaultChannels))
+    }    // Load voice channel users from localStorage if available
+    const storedVoiceChannelUsers = localStorage.getItem("verdant_voice_channel_users")
+    if (storedVoiceChannelUsers) {      try {
+        const parsed = JSON.parse(storedVoiceChannelUsers)
+        // Clean any duplicate user IDs and ensure proper types
+        const cleanedData: { [channelId: string]: string[] } = {}
+        Object.keys(parsed).forEach(channelId => {
+          const userIds = parsed[channelId]
+          if (Array.isArray(userIds)) {
+            // Double deduplication: filter strings and then remove duplicates
+            const stringIds = userIds.filter((id: any) => typeof id === 'string')
+            cleanedData[channelId] = [...new Set(stringIds)]
+          }
+        })
+        setVoiceChannelUsers(cleanedData)
+      } catch (error) {
+        console.error("Error parsing voice channel users from localStorage:", error)
+        setVoiceChannelUsers({})
+      }
     }
 
     // Load messages from localStorage if available
@@ -158,7 +182,6 @@ export function ChannelProvider({ children }: { children: ReactNode }) {
       localStorage.setItem("verdant_messages", JSON.stringify(messagesWithUsers))
     }
   }, [users])
-
   // Update localStorage whenever channels or messages change
   useEffect(() => {
     localStorage.setItem("verdant_channels", JSON.stringify(channels))
@@ -167,6 +190,11 @@ export function ChannelProvider({ children }: { children: ReactNode }) {
   useEffect(() => {
     localStorage.setItem("verdant_messages", JSON.stringify(messages))
   }, [messages])
+
+  // Update localStorage whenever voice channel users change
+  useEffect(() => {
+    localStorage.setItem("verdant_voice_channel_users", JSON.stringify(voiceChannelUsers))
+  }, [voiceChannelUsers])
 
   const currentChannel = currentChannelId ? channels.find((channel) => channel.id === currentChannelId) || null : null
 
@@ -200,9 +228,7 @@ export function ChannelProvider({ children }: { children: ReactNode }) {
 
   const deleteChannel = async (channelId: string): Promise<void> => {
     // Simulate API call
-    await new Promise((resolve) => setTimeout(resolve, 500))
-
-    // Remove the channel
+    await new Promise((resolve) => setTimeout(resolve, 500))    // Remove the channel
     setChannels((prev) => prev.filter((channel) => channel.id !== channelId))
 
     // If the current channel is being deleted, switch to another channel in the same server
@@ -215,10 +241,29 @@ export function ChannelProvider({ children }: { children: ReactNode }) {
       } else {
         setCurrentChannelId(null)
       }
-    }
-
-    // Remove all messages for this channel
+    }    // Remove all messages for this channel
     setMessages((prev) => prev.filter((message) => message.channelId !== channelId))
+  }
+
+  const joinVoiceChannel = (channelId: string, userId: string) => {
+    setVoiceChannelUsers((prev) => {
+      const current = prev[channelId] || []
+      // Check if user is already in channel to prevent duplicates
+      if (current.includes(userId)) {
+        return prev
+      }
+        // Additional deduplication: ensure no duplicates in the new array
+      const updated = { ...prev, [channelId]: [...new Set([...current, userId])] }
+      return updated
+    })
+  }
+
+  const leaveVoiceChannel = (channelId: string, userId: string) => {
+    setVoiceChannelUsers((prev) => {
+      const current = prev[channelId] || []
+      const updated = { ...prev, [channelId]: current.filter((id) => id !== userId) }
+      return updated
+    })
   }
 
   return (
@@ -232,6 +277,9 @@ export function ChannelProvider({ children }: { children: ReactNode }) {
         sendMessage,
         createChannel,
         deleteChannel,
+        voiceChannelUsers,
+        joinVoiceChannel,
+        leaveVoiceChannel,
       }}
     >
       {children}

@@ -4,6 +4,7 @@ import { useContext, useState } from "react"
 import { useRouter } from "next/navigation"
 import { ServerContext } from "@/context/server-context"
 import { ChannelContext } from "@/context/channel-context"
+import { UserContext } from "@/context/user-context"
 import { Settings, Plus, ChevronDown, ChevronRight, Lock, Hash, Volume2, Video, MoreVertical } from "@/components/ui/safe-icons"
 import { cn } from "@/lib/utils"
 import { Collapsible, CollapsibleContent, CollapsibleTrigger } from "@/components/ui/collapsible"
@@ -14,11 +15,13 @@ import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 import { useToast } from "@/hooks/use-toast"
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group"
+import { Avatar, AvatarImage, AvatarFallback } from "@/components/ui/avatar"
 
 export default function ChannelSidebar() {  const router = useRouter()
   const { toast } = useToast()
   const { currentServer, leaveServer } = useContext(ServerContext)
-  const { channels, currentChannelId, setCurrentChannelId, createChannel, deleteChannel } = useContext(ChannelContext)
+  const { channels, currentChannelId, setCurrentChannelId, createChannel, deleteChannel, voiceChannelUsers, joinVoiceChannel, leaveVoiceChannel } = useContext(ChannelContext)
+  const { users, currentUser } = useContext(UserContext)
 
   const [categoryStates, setCategoryStates] = useState({
     text: true,
@@ -162,16 +165,6 @@ export default function ChannelSidebar() {  const router = useRouter()
                   <ChevronRight className="w-3 h-3 mr-1 text-primary group-hover:text-primary/80" />
                 )}
                 <span className="neon-text tracking-wider">TEXT CHANNELS</span>
-                <button
-                  className="ml-auto text-gray-400 hover:text-primary/80 opacity-0 group-hover:opacity-100 transition-opacity"
-                  onClick={(e) => {
-                    e.stopPropagation()
-                    setNewChannelData({ name: "", type: "text", private: false })
-                    setIsCreateChannelModalOpen(true)
-                  }}
-                >
-                  <Plus className="w-4 h-4" />
-                </button>
               </div>
             </CollapsibleTrigger>
             <CollapsibleContent className="space-y-0.5 mt-1">
@@ -207,85 +200,138 @@ export default function ChannelSidebar() {  const router = useRouter()
           </Collapsible>
 
           {/* Voice Channels */}          <Collapsible open={categoryStates.voice} className="mb-2">
-            <CollapsibleTrigger asChild>
-              <div
-                onClick={() => toggleCategory("voice")}
-                className="flex items-center w-full text-xs font-semibold text-gray-400 hover:text-white py-1 px-1 cursor-pointer group hover:bg-secondary/10 rounded-md transition-colors"
-              >
-                {categoryStates.voice ? (
-                  <ChevronDown className="w-3 h-3 mr-1 text-secondary group-hover:text-secondary/80" />
-                ) : (
-                  <ChevronRight className="w-3 h-3 mr-1 text-secondary group-hover:text-secondary/80" />
-                )}
-                <span className="neon-text tracking-wider">VOICE CHANNELS</span>
+            <div className="flex items-center w-full">
+              <CollapsibleTrigger asChild>
                 <button
-                  className="ml-auto text-gray-400 hover:text-secondary/80 opacity-0 group-hover:opacity-100 transition-opacity"
-                  onClick={(e) => {
-                    e.stopPropagation()
-                    setNewChannelData({ name: "", type: "voice", private: false })
-                    setIsCreateChannelModalOpen(true)
-                  }}
+                  type="button"
+                  className="flex items-center flex-1 text-xs font-semibold text-gray-400 hover:text-white py-1 px-1 cursor-pointer group hover:bg-secondary/10 rounded-md transition-colors"
+                  onClick={() => toggleCategory("voice")}
                 >
-                  <Plus className="w-4 h-4" />
+                  {categoryStates.voice ? (
+                    <ChevronDown className="w-3 h-3 mr-1 text-secondary group-hover:text-secondary/80" />
+                  ) : (
+                    <ChevronRight className="w-3 h-3 mr-1 text-secondary group-hover:text-secondary/80" />
+                  )}
+                  <span className="neon-text tracking-wider">VOICE CHANNELS</span>
                 </button>
-              </div>
-            </CollapsibleTrigger>
-            <CollapsibleContent className="space-y-0.5 mt-1">
-              {voiceChannels.map((channel) => (
-                <div key={channel.id} className="group relative">                  <button
-                    className={cn(
-                      "flex items-center w-full rounded-md py-1 px-2 my-1 text-gray-400 hover:bg-secondary/20 hover:text-white transition-colors",
-                      currentChannelId === channel.id && "bg-secondary/30 text-white"
+              </CollapsibleTrigger>
+              <button
+                className="ml-auto text-gray-400 hover:text-secondary/80 transition-opacity"
+                onClick={(e) => {
+                  e.stopPropagation()
+                  setNewChannelData({ name: "", type: "voice", private: false })
+                  setIsCreateChannelModalOpen(true)
+                }}
+              >
+                <Plus className="w-4 h-4" />
+              </button>
+            </div>            <CollapsibleContent className="space-y-0.5 mt-1">              {voiceChannels.map((channel) => {
+                const userIds = voiceChannelUsers[channel.id] || []
+                
+                // First, ensure we only have valid string IDs and remove duplicates
+                const uniqueUserIds = [...new Set(userIds.filter(id => typeof id === 'string' && id.trim() !== ''))]
+                
+                // Create a Map to ensure we only get one user object per ID
+                const userMap = new Map()
+                users.forEach(user => {
+                  if (uniqueUserIds.includes(user.id)) {
+                    userMap.set(user.id, user)
+                  }
+                })
+                
+                // Convert map back to array, maintaining the order of uniqueUserIds
+                const deduplicatedUsers = uniqueUserIds.map(id => userMap.get(id)).filter(Boolean)
+                
+                const isInChannel = currentUser && uniqueUserIds.includes(currentUser.id)
+                
+                return (
+                  <div key={channel.id} className="group relative">
+                    <button
+                      className={cn(
+                        "flex items-center w-full rounded-md py-1 px-2 my-1 text-gray-400 hover:bg-secondary/20 hover:text-white transition-colors",
+                        currentChannelId === channel.id && "bg-secondary/30 text-white"
+                      )}
+                      onClick={() => {
+                        setCurrentChannelId(channel.id)
+                        if (currentUser && !isInChannel) {
+                          joinVoiceChannel(channel.id, currentUser.id)
+                        }
+                      }}
+                    >
+                      {getChannelIcon(channel.type)}
+                      <span className="truncate">{channel.name}</span>
+                      {channel.private && <Lock className="w-3 h-3 ml-1 opacity-70" />}
+                    </button>
+                    <div className="flex items-center gap-2 mt-1 ml-8">
+                      {currentUser && isInChannel && (
+                        <button
+                          className="text-xs px-2 py-0.5 rounded bg-destructive/20 text-destructive hover:bg-destructive/40 transition-colors"
+                          onClick={() => leaveVoiceChannel(channel.id, currentUser.id)}
+                        >
+                          Leave
+                        </button>
+                      )}
+                    </div>                    {deduplicatedUsers.length > 0 && (
+                      <div className="flex flex-col gap-1 mt-1 ml-8">
+                        {deduplicatedUsers.map((user: any) => (
+                          <div key={`voice-${channel.id}-${user.id}`} className="flex items-center gap-2">
+                            <Avatar className="w-6 h-6">
+                              <AvatarImage src={user.avatar || "/placeholder.svg?height=100&width=100"} alt={user.username} />
+                              <AvatarFallback>{user.username.substring(0, 2).toUpperCase()}</AvatarFallback>
+                            </Avatar>
+                            <span className="text-xs text-white">{user.username}</span>
+                          </div>
+                        ))}
+                      </div>
                     )}
-                    onClick={() => setCurrentChannelId(channel.id)}
-                  >
-                    {getChannelIcon(channel.type)}
-                    <span className="truncate">{channel.name}</span>
-                    {channel.private && <Lock className="w-3 h-3 ml-1 opacity-70" />}
-                  </button>
-                  <DropdownMenu>
-                    <DropdownMenuTrigger asChild>
-                      <button className="absolute right-2 top-1/2 -translate-y-1/2 opacity-0 group-hover:opacity-100 text-gray-400 hover:text-white">
-                        <MoreVertical className="h-4 w-4" />
-                      </button>
-                    </DropdownMenuTrigger>                    <DropdownMenuContent className="acrylic-light border-secondary/30 text-white">
-                      <DropdownMenuItem
-                        className="cursor-pointer text-destructive hover:bg-destructive/20 hover:text-destructive focus:bg-destructive/20 focus:text-destructive"
-                        onClick={() => handleDeleteChannel(channel.id)}
-                      >
-                        Delete Channel
-                      </DropdownMenuItem>
-                    </DropdownMenuContent>
-                  </DropdownMenu>
-                </div>
-              ))}
+                    <DropdownMenu>
+                      <DropdownMenuTrigger asChild>
+                        <button className="absolute right-2 top-1/2 -translate-y-1/2 opacity-0 group-hover:opacity-100 text-gray-400 hover:text-white">
+                          <MoreVertical className="h-4 w-4" />
+                        </button>
+                      </DropdownMenuTrigger>
+                      <DropdownMenuContent className="acrylic-light border-secondary/30 text-white">
+                        <DropdownMenuItem
+                          className="cursor-pointer text-destructive hover:bg-destructive/20 hover:text-destructive focus:bg-destructive/20 focus:text-destructive"
+                          onClick={() => handleDeleteChannel(channel.id)}
+                        >
+                          Delete Channel
+                        </DropdownMenuItem>
+                      </DropdownMenuContent>
+                    </DropdownMenu>
+                  </div>
+                )
+              })}
             </CollapsibleContent>
           </Collapsible>
 
           {/* Video Channels */}          <Collapsible open={categoryStates.video} className="mb-2">
-            <CollapsibleTrigger asChild>
-              <div
-                onClick={() => toggleCategory("video")}
-                className="flex items-center w-full text-xs font-semibold text-gray-400 hover:text-white py-1 px-1 cursor-pointer group hover:bg-accent/10 rounded-md transition-colors"
-              >
-                {categoryStates.video ? (
-                  <ChevronDown className="w-3 h-3 mr-1 text-accent group-hover:text-accent" />
-                ) : (
-                  <ChevronRight className="w-3 h-3 mr-1 text-accent group-hover:text-accent" />
-                )}
-                <span className="neon-text tracking-wider">VIDEO CHANNELS</span>
+            <div className="flex items-center w-full">
+              <CollapsibleTrigger asChild>
                 <button
-                  className="ml-auto text-gray-400 hover:text-accent opacity-0 group-hover:opacity-100 transition-opacity"
-                  onClick={(e) => {
-                    e.stopPropagation()
-                    setNewChannelData({ name: "", type: "video", private: false })
-                    setIsCreateChannelModalOpen(true)
-                  }}
+                  type="button"
+                  className="flex items-center flex-1 text-xs font-semibold text-gray-400 hover:text-white py-1 px-1 cursor-pointer group hover:bg-accent/10 rounded-md transition-colors"
+                  onClick={() => toggleCategory("video")}
                 >
-                  <Plus className="w-4 h-4" />
+                  {categoryStates.video ? (
+                    <ChevronDown className="w-3 h-3 mr-1 text-accent group-hover:text-accent" />
+                  ) : (
+                    <ChevronRight className="w-3 h-3 mr-1 text-accent group-hover:text-accent" />
+                  )}
+                  <span className="neon-text tracking-wider">VIDEO CHANNELS</span>
                 </button>
-              </div>
-            </CollapsibleTrigger>
+              </CollapsibleTrigger>
+              <button
+                className="ml-auto text-gray-400 hover:text-accent transition-opacity"
+                onClick={(e) => {
+                  e.stopPropagation()
+                  setNewChannelData({ name: "", type: "video", private: false })
+                  setIsCreateChannelModalOpen(true)
+                }}
+              >
+                <Plus className="w-4 h-4" />
+              </button>
+            </div>
             <CollapsibleContent className="space-y-0.5 mt-1">
               {videoChannels.map((channel) => (
                 <div key={channel.id} className="group relative">

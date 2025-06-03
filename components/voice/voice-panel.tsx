@@ -24,8 +24,8 @@ import { cn } from "@/lib/utils"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
 
 export default function VoicePanel() {
-  const { currentUser } = useContext(UserContext)
-  const { currentChannel } = useContext(ChannelContext)
+  const { currentUser, users } = useContext(UserContext)
+  const { currentChannel, voiceChannelUsers } = useContext(ChannelContext)
 
   const [isMicOn, setIsMicOn] = useState(true)
   const [isDeafened, setIsDeafened] = useState(false)
@@ -35,35 +35,27 @@ export default function VoicePanel() {
 
   const videoRef = useRef<HTMLVideoElement>(null)
   const screenRef = useRef<HTMLVideoElement>(null)
-
-  // Mock participants
-  const participants = [    {
-      id: "1",
-      username: "Alex",
-      avatar: "/placeholder.svg?height=100&width=100",
-      isSpeaking: true,
-      isMuted: false,
-      hasCamera: true,
-      isCameraOn: false,
-    },    {
-      id: "2",
-      username: "Sarah",
-      avatar: "/placeholder.svg?height=100&width=100",
-      isSpeaking: false,
-      isMuted: true,
-      hasCamera: true,
-      isCameraOn: false,
-    },
-    {
-      id: "3",
-      username: "Michael",
-      avatar: "/placeholder.svg?height=100&amp;width=100",
-      isSpeaking: false,
-      isMuted: false,
-      hasCamera: false,
-      isCameraOn: false,
-    },
-  ]
+  // Get real participants from voice channel users
+  const participants = currentChannel 
+    ? (voiceChannelUsers[currentChannel.id] || [])
+        // Deduplicate user IDs
+        .filter((userId, index, array) => array.indexOf(userId) === index)
+        .filter(userId => userId !== currentUser?.id) // Exclude current user
+        .map(userId => {
+          const user = users.find(u => u.id === userId)
+          if (!user) return null
+          return {
+            id: user.id,
+            username: user.username,
+            avatar: user.avatar,
+            isSpeaking: Math.random() > 0.5, // Random speaking state for demo
+            isMuted: Math.random() > 0.7, // Random muted state for demo
+            hasCamera: true,
+            isCameraOn: false,
+          }
+        })
+        .filter((p): p is NonNullable<typeof p> => p !== null) // Remove null entries with type guard
+    : []
 
   // Handle camera toggle
   const toggleCamera = async () => {
@@ -270,8 +262,8 @@ export default function VoicePanel() {
         </Button>
         <div className="flex space-x-2">
           <TooltipProvider delayDuration={300}>
-            <Tooltip>
-              <TooltipTrigger asChild>                <Button
+            <Tooltip>              <TooltipTrigger asChild>
+                <Button
                   variant="outline"
                   size="icon"
                   className={cn("rounded-full w-10 h-10", isMicOn ? "bg-gray-700" : "bg-destructive hover:bg-destructive/80")}
@@ -287,8 +279,8 @@ export default function VoicePanel() {
           </TooltipProvider>
 
           <TooltipProvider delayDuration={300}>
-            <Tooltip>
-              <TooltipTrigger asChild>                <Button
+            <Tooltip>              <TooltipTrigger asChild>
+                <Button
                   variant="outline"
                   size="icon"
                   className={cn("rounded-full w-10 h-10", isDeafened ? "bg-destructive hover:bg-destructive/80" : "bg-gray-700")}

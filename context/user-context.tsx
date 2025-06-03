@@ -16,11 +16,10 @@ export const UserContext = createContext<UserContextType>({
 
 export function UserProvider({ children }: { children: ReactNode }) {
   const { currentUser: authUser } = useAuth()
-
   // Mock data
   const mockUsers: User[] = [
     {
-      id: "1",
+      id: "mock_1",
       username: "verdant_user",
       discriminator: "0001",
       avatar: "/placeholder.svg?height=100&width=100",
@@ -28,7 +27,7 @@ export function UserProvider({ children }: { children: ReactNode }) {
       status: "online",
     },
     {
-      id: "2",
+      id: "mock_2",
       username: "alex",
       discriminator: "1234",
       avatar: "/placeholder.svg?height=100&width=100",
@@ -36,7 +35,7 @@ export function UserProvider({ children }: { children: ReactNode }) {
       status: "online",
     },
     {
-      id: "3",
+      id: "mock_3",
       username: "sarah",
       discriminator: "5678",
       avatar: "/placeholder.svg?height=100&width=100",
@@ -44,7 +43,7 @@ export function UserProvider({ children }: { children: ReactNode }) {
       status: "idle",
     },
     {
-      id: "4",
+      id: "mock_4",
       username: "michael",
       discriminator: "9012",
       avatar: "/placeholder.svg?height=100&width=100",
@@ -55,7 +54,6 @@ export function UserProvider({ children }: { children: ReactNode }) {
 
   const [users, setUsers] = useState<User[]>(mockUsers)
   const [currentUser, setCurrentUser] = useState<User | null>(mockUsers[0])
-
   // Update current user when auth changes
   useEffect(() => {
     if (authUser) {
@@ -71,9 +69,23 @@ export function UserProvider({ children }: { children: ReactNode }) {
             discriminator: authUser.discriminator,
             avatar: authUser.avatar,
             bio: authUser.bio,
-            status: "online",
+            status: authUser.status || "online",
           },
         ])
+      } else {
+        // Update existing user in the users array with latest auth data
+        setUsers((prev) => prev.map((user) => 
+          user.id === authUser.id 
+            ? {
+                ...user,
+                username: authUser.username,
+                discriminator: authUser.discriminator,
+                avatar: authUser.avatar,
+                bio: authUser.bio,
+                status: authUser.status || "online",
+              }
+            : user
+        ))
       }
 
       // Set the current user
@@ -83,13 +95,13 @@ export function UserProvider({ children }: { children: ReactNode }) {
         discriminator: authUser.discriminator,
         avatar: authUser.avatar,
         bio: authUser.bio,
-        status: "online",
+        status: authUser.status || "online",
       })
     } else {
       // Fallback to the first mock user if not authenticated
       setCurrentUser(mockUsers[0])
     }
-  }, [authUser, users])
+  }, [authUser])
 
   return (
     <UserContext.Provider
