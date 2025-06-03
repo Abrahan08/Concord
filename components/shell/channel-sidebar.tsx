@@ -243,51 +243,80 @@ export default function ChannelSidebar() {  const router = useRouter()
                 const deduplicatedUsers = uniqueUserIds.map(id => userMap.get(id)).filter(Boolean)
                 
                 const isInChannel = currentUser && uniqueUserIds.includes(currentUser.id)
-                
-                return (
-                  <div key={channel.id} className="group relative">
-                    <button
-                      className={cn(
-                        "flex items-center w-full rounded-md py-1 px-2 my-1 text-gray-400 hover:bg-secondary/20 hover:text-white transition-colors",
-                        currentChannelId === channel.id && "bg-secondary/30 text-white"
-                      )}                      onClick={() => {
-                        // Just set the channel ID without opening voice panel
-                        // Users can manually join voice channels through other means
-                        setCurrentChannelId(channel.id)
-                        // Removed automatic voice channel joining
-                      }}
-                    >
-                      {getChannelIcon(channel.type)}
-                      <span className="truncate">{channel.name}</span>
-                      {channel.private && <Lock className="w-3 h-3 ml-1 opacity-70" />}                    </button>
+                  return (
+                  <div key={channel.id} className="group">
+                    <div className="relative">
+                      <button
+                        className={cn(
+                          "flex items-center w-full rounded-md py-1 px-2 my-1 text-gray-400 hover:bg-secondary/20 hover:text-white transition-colors",
+                          currentChannelId === channel.id && "bg-secondary/30 text-white"
+                        )}                        onClick={() => {
+                          // Just set the channel ID without opening voice panel
+                          // Users can manually join voice channels through other means
+                          setCurrentChannelId(channel.id)
+                          // Removed automatic voice channel joining
+                        }}
+                      >
+                        {getChannelIcon(channel.type)}
+                        <span className="truncate">{channel.name}</span>
+                        {channel.private && <Lock className="w-3 h-3 ml-1 opacity-70" />}                      </button>
+                      <DropdownMenu>
+                        <DropdownMenuTrigger asChild>
+                          <button className="absolute right-2 top-1/2 -translate-y-1/2 opacity-0 group-hover:opacity-100 text-gray-400 hover:text-white">
+                            <MoreVertical className="h-4 w-4" />
+                          </button>
+                        </DropdownMenuTrigger>
+                        <DropdownMenuContent className="acrylic-light border-secondary/30 text-white">
+                          <DropdownMenuItem
+                            className="cursor-pointer text-destructive hover:bg-destructive/20 hover:text-destructive focus:bg-destructive/20 focus:text-destructive"
+                            onClick={() => handleDeleteChannel(channel.id)}
+                          >
+                            Delete Channel
+                          </DropdownMenuItem>
+                        </DropdownMenuContent>
+                      </DropdownMenu>
+                    </div>
                     {deduplicatedUsers.length > 0 && (
-                      <div className="flex flex-col gap-1 mt-1 ml-8">
+                      <div className="flex flex-col gap-1 mt-1 ml-6">
                         {deduplicatedUsers.map((user: any) => (
-                          <div key={`voice-${channel.id}-${user.id}`} className="flex items-center gap-2">
-                            <Avatar className="w-6 h-6">
-                              <AvatarImage src={user.avatar || "/placeholder.svg?height=100&width=100"} alt={user.username} />
-                              <AvatarFallback>{user.username.substring(0, 2).toUpperCase()}</AvatarFallback>
-                            </Avatar>
-                            <span className="text-xs text-white">{user.username}</span>
+                          <div key={`voice-${channel.id}-${user.id}`} className="group/user relative">
+                            <div className="flex items-center gap-2 py-1 px-2 rounded-md hover:bg-secondary/20 transition-colors">
+                              <Avatar className="w-6 h-6">
+                                <AvatarImage src={user.avatar || "/placeholder.svg?height=100&width=100"} alt={user.username} />
+                                <AvatarFallback>{user.username.substring(0, 2).toUpperCase()}</AvatarFallback>
+                              </Avatar>
+                              <span className="text-xs text-white flex-1">{user.username}</span>
+                              <DropdownMenu>
+                                <DropdownMenuTrigger asChild>
+                                  <button className="opacity-0 group-hover/user:opacity-100 text-gray-400 hover:text-white p-1 rounded transition-all">
+                                    <MoreVertical className="h-3 w-3" />
+                                  </button>
+                                </DropdownMenuTrigger>
+                                <DropdownMenuContent className="acrylic-light border-secondary/30 text-white" align="end">
+                                  <DropdownMenuItem className="cursor-pointer hover:bg-secondary/20 hover:text-white focus:bg-secondary/20 focus:text-white">
+                                    View Profile
+                                  </DropdownMenuItem>
+                                  <DropdownMenuItem className="cursor-pointer hover:bg-secondary/20 hover:text-white focus:bg-secondary/20 focus:text-white">
+                                    Send Message
+                                  </DropdownMenuItem>
+                                  <DropdownMenuItem className="cursor-pointer hover:bg-secondary/20 hover:text-white focus:bg-secondary/20 focus:text-white">
+                                    Mute
+                                  </DropdownMenuItem>
+                                  <DropdownMenuItem className="cursor-pointer hover:bg-secondary/20 hover:text-white focus:bg-secondary/20 focus:text-white">
+                                    Deafen
+                                  </DropdownMenuItem>
+                                  {currentUser?.id !== user.id && (
+                                    <DropdownMenuItem className="cursor-pointer text-destructive hover:bg-destructive/20 hover:text-destructive focus:bg-destructive/20 focus:text-destructive">
+                                      Kick from Voice
+                                    </DropdownMenuItem>
+                                  )}
+                                </DropdownMenuContent>
+                              </DropdownMenu>
+                            </div>
                           </div>
                         ))}
                       </div>
                     )}
-                    <DropdownMenu>
-                      <DropdownMenuTrigger asChild>
-                        <button className="absolute right-2 top-1/2 -translate-y-1/2 opacity-0 group-hover:opacity-100 text-gray-400 hover:text-white">
-                          <MoreVertical className="h-4 w-4" />
-                        </button>
-                      </DropdownMenuTrigger>
-                      <DropdownMenuContent className="acrylic-light border-secondary/30 text-white">
-                        <DropdownMenuItem
-                          className="cursor-pointer text-destructive hover:bg-destructive/20 hover:text-destructive focus:bg-destructive/20 focus:text-destructive"
-                          onClick={() => handleDeleteChannel(channel.id)}
-                        >
-                          Delete Channel
-                        </DropdownMenuItem>
-                      </DropdownMenuContent>
-                    </DropdownMenu>
                   </div>
                 )
               })}
