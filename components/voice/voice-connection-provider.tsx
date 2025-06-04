@@ -1,6 +1,6 @@
 "use client"
 
-import { createContext, useState, useContext, useEffect, ReactNode } from "react"
+import { createContext, useState, useContext, useEffect, useRef, ReactNode } from "react"
 import { ChannelContext } from "@/context/channel-context"
 import { ServerContext } from "@/context/server-context"
 import { useAuth } from "@/hooks/use-auth"
@@ -42,6 +42,17 @@ export function VoiceConnectionProvider({ children }: { children: ReactNode }) {
   const [currentVoiceChannelId, setCurrentVoiceChannelId] = useState<string | null>(null)
   const [isScreenSharing, setIsScreenSharing] = useState(false)
   
+  // Use refs to track current state for cleanup
+  const connectionStateRef = useRef({ isConnected: false, currentVoiceChannelId: null as string | null, currentUser: null as any })
+  
+  // Update ref whenever state changes
+  useEffect(() => {
+    connectionStateRef.current = {
+      isConnected,
+      currentVoiceChannelId,
+      currentUser
+    }
+  }, [isConnected, currentVoiceChannelId, currentUser])
   // Check if current channel is a voice channel
   useEffect(() => {
     if (currentChannel?.type === "voice" || currentChannel?.type === "video") {
@@ -125,16 +136,16 @@ export function VoiceConnectionProvider({ children }: { children: ReactNode }) {
       }
     }
   }
-  
-  // Cleanup effect when component unmounts or currentChannel changes
+    // Cleanup effect when component unmounts or currentChannel changes
   useEffect(() => {
     return () => {
       // If the user is connected to a voice channel when navigating away, disconnect them
-      if (isConnected && currentVoiceChannelId && currentUser) {
-        leaveVoiceChannel(currentVoiceChannelId, currentUser.id);
+      const state = connectionStateRef.current
+      if (state.isConnected && state.currentVoiceChannelId && state.currentUser) {
+        leaveVoiceChannel(state.currentVoiceChannelId, state.currentUser.id);
       }
     };
-  }, [isConnected, currentVoiceChannelId, currentUser, leaveVoiceChannel]);
+  }, []); // Empty dependency array to prevent infinite loops
 
   const toggleScreenShare = () => {
     setIsScreenSharing(prev => !prev)

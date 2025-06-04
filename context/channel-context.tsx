@@ -1,6 +1,6 @@
 "use client"
 
-import { createContext, useState, useContext, useEffect, type ReactNode } from "react"
+import { createContext, useState, useContext, useEffect, useCallback, type ReactNode } from "react"
 import { UserContext } from "./user-context"
 import { ServerContext } from "./server-context"
 
@@ -125,9 +125,22 @@ export function ChannelProvider({ children }: { children: ReactNode }) {
       userId: "mock_1",
       content: "Let's schedule a video call to discuss the new project.",
       timestamp: new Date(Date.now() - 3600000).toISOString(),
-    },
-  ]
-  const [channels, setChannels] = useState<Channel[]>(defaultChannels)
+    },  ]
+  const [channels, setChannels] = useState<Channel[]>(() => {
+    // Initialize channels from localStorage on first load
+    if (typeof window !== 'undefined') {
+      const storedChannels = localStorage.getItem("verdant_channels")
+      if (storedChannels) {
+        try {
+          return JSON.parse(storedChannels)
+        } catch (error) {
+          console.error('Error parsing stored channels:', error)
+        }
+      }
+    }
+    // Return default channels if no stored data or error
+    return defaultChannels
+  })
   const [currentChannelId, setCurrentChannelId] = useState<string | null>("1")
   const [messages, setMessages] = useState<Message[]>([])
   const [voiceChannelUsers, setVoiceChannelUsers] = useState<{ [channelId: string]: string[] }>({})
@@ -183,20 +196,23 @@ export function ChannelProvider({ children }: { children: ReactNode }) {
           }, 100) // Small delay to ensure channels are updated
         }
       }
-    })
-  }, [servers, channels])
+    })  }, [servers, channels])
 
   useEffect(() => {
-    // Load channels from localStorage if available
-    const storedChannels = localStorage.getItem("verdant_channels")
-    if (storedChannels) {
-      setChannels(JSON.parse(storedChannels))
-    } else {
-      // Initialize with default channels if none exist
-      localStorage.setItem("verdant_channels", JSON.stringify(defaultChannels))
-    }    // Load voice channel users from localStorage if available
+    // Initialize localStorage with default channels if none exist (only run once)
+    if (typeof window !== 'undefined') {
+      const storedChannels = localStorage.getItem("verdant_channels")
+      if (!storedChannels) {
+        localStorage.setItem("verdant_channels", JSON.stringify(defaultChannels))
+      }
+    }
+  }, []) // Only run once on mount
+
+  useEffect(() => {
+    // Load voice channel users from localStorage if available
     const storedVoiceChannelUsers = localStorage.getItem("verdant_voice_channel_users")
-    if (storedVoiceChannelUsers) {      try {
+    if (storedVoiceChannelUsers) {
+      try {
         const parsed = JSON.parse(storedVoiceChannelUsers)
         // Clean any duplicate user IDs and ensure proper types
         const cleanedData: { [channelId: string]: string[] } = {}
@@ -300,8 +316,7 @@ export function ChannelProvider({ children }: { children: ReactNode }) {
     }    // Remove all messages for this channel
     setMessages((prev) => prev.filter((message) => message.channelId !== channelId))
   }
-
-  const joinVoiceChannel = (channelId: string, userId: string) => {
+  const joinVoiceChannel = useCallback((channelId: string, userId: string) => {
     setVoiceChannelUsers((prev) => {
       const current = prev[channelId] || []
       // Check if user is already in channel to prevent duplicates
@@ -312,15 +327,15 @@ export function ChannelProvider({ children }: { children: ReactNode }) {
       const updated = { ...prev, [channelId]: [...new Set([...current, userId])] }
       return updated
     })
-  }
+  }, [])
 
-  const leaveVoiceChannel = (channelId: string, userId: string) => {
+  const leaveVoiceChannel = useCallback((channelId: string, userId: string) => {
     setVoiceChannelUsers((prev) => {
       const current = prev[channelId] || []
       const updated = { ...prev, [channelId]: current.filter((id) => id !== userId) }
       return updated
     })
-  }
+  }, [])
 
   return (
     <ChannelContext.Provider

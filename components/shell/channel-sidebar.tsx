@@ -5,7 +5,7 @@ import { useRouter } from "next/navigation"
 import { ServerContext } from "@/context/server-context"
 import { ChannelContext } from "@/context/channel-context"
 import { UserContext } from "@/context/user-context"
-import { Settings, Plus, ChevronDown, ChevronRight, Lock, Hash, Volume2, Video, MoreVertical } from "@/components/ui/safe-icons"
+import { Settings, Plus, ChevronDown, ChevronRight, Lock, Hash, Volume2, MoreVertical, UserPlus, Bell, Shield, LogOut } from "@/components/ui/safe-icons"
 import { cn } from "@/lib/utils"
 import { Collapsible, CollapsibleContent, CollapsibleTrigger } from "@/components/ui/collapsible"
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "@/components/ui/dropdown-menu"
@@ -17,22 +17,24 @@ import { useToast } from "@/hooks/use-toast"
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group"
 import { Avatar, AvatarImage, AvatarFallback } from "@/components/ui/avatar"
 
-export default function ChannelSidebar() {  const router = useRouter()
+export default function ChannelSidebar() {
+  const router = useRouter()
   const { toast } = useToast()
   const { currentServer, leaveServer } = useContext(ServerContext)
   const { channels, currentChannelId, setCurrentChannelId, createChannel, deleteChannel, voiceChannelUsers, joinVoiceChannel, leaveVoiceChannel } = useContext(ChannelContext)
   const { users, currentUser } = useContext(UserContext)
 
+  // For now, we'll assume user owns server if it's server ID "1" or if they're the first user
+  // In a real app, this would come from the server data with an ownerId field
+  const isServerOwner = currentServer?.id === "1" || (currentUser && currentUser.id === "mock_1")
   const [categoryStates, setCategoryStates] = useState({
     text: true,
     voice: true,
-    video: true,
   })
-
   const [isCreateChannelModalOpen, setIsCreateChannelModalOpen] = useState(false)
   const [newChannelData, setNewChannelData] = useState({
     name: "",
-    type: "text" as "text" | "voice" | "video",
+    type: "text" as "text" | "voice",
     private: false,
   })
 
@@ -42,15 +44,12 @@ export default function ChannelSidebar() {  const router = useRouter()
       [category]: !categoryStates[category],
     })
   }
-
   const getChannelIcon = (type: string) => {
     switch (type) {
       case "text":
         return <Hash className="w-5 h-5 mr-2 text-gray-400" />
       case "voice":
         return <Volume2 className="w-5 h-5 mr-2 text-gray-400" />
-      case "video":
-        return <Video className="w-5 h-5 mr-2 text-gray-400" />
       default:
         return <Hash className="w-5 h-5 mr-2 text-gray-400" />
     }
@@ -104,7 +103,6 @@ export default function ChannelSidebar() {  const router = useRouter()
       }
     }
   }
-
   const handleDeleteServer = async () => {
     if (!currentServer) return
     
@@ -126,28 +124,143 @@ export default function ChannelSidebar() {  const router = useRouter()
     }
   }
 
-  if (!currentServer) return null
+  const handleLeaveGuild = async () => {
+    if (!currentServer) return
+    
+    if (confirm(`Are you sure you want to leave "${currentServer.name}"?`)) {
+      try {
+        await leaveServer(currentServer.id)
+        toast({
+          title: "Left guild",
+          description: `You have left ${currentServer.name}.`,
+        })
+        router.push('/main') // Redirect to main page after leaving
+      } catch (error) {
+        toast({
+          title: "Failed to leave guild",
+          description: "There was an error leaving the guild.",
+          variant: "destructive",
+        })
+      }
+    }
+  }
 
+  // Placeholder handlers for menu items
+  const handleInvitePeople = () => {
+    toast({
+      title: "Invite People",
+      description: "Invite functionality will be implemented soon.",
+    })
+  }
+
+  const handleServerSettings = () => {
+    toast({
+      title: "Server Settings",
+      description: "Server settings panel will be implemented soon.",
+    })
+  }
+
+  const handleCreateCategory = () => {
+    toast({
+      title: "Create Category",
+      description: "Category creation will be implemented soon.",
+    })
+  }
+
+  const handleNotificationSettings = () => {
+    toast({
+      title: "Notification Settings",
+      description: "Notification settings will be implemented soon.",
+    })
+  }
+
+  const handlePrivacySettings = () => {
+    toast({
+      title: "Privacy Settings",
+      description: "Privacy settings will be implemented soon.",
+    })
+  }
+
+  if (!currentServer) return null
   const textChannels = channels.filter((channel) => channel.serverId === currentServer.id && channel.type === "text")
   const voiceChannels = channels.filter((channel) => channel.serverId === currentServer.id && channel.type === "voice")
-  const videoChannels = channels.filter((channel) => channel.serverId === currentServer.id && channel.type === "video")
 
   return (
     <>      <div className="w-[250px] acrylic border-r border-primary/30 flex flex-col">        <div className="h-12 border-b border-primary/30 flex items-center px-4 font-semibold">
-          <h2 className="flex-1 truncate text-white futuristic-text">{currentServer?.name}</h2>
-          <DropdownMenu>
+          <h2 className="flex-1 truncate text-white futuristic-text">{currentServer?.name}</h2>          <DropdownMenu>
             <DropdownMenuTrigger asChild>
               <button className="text-primary hover:text-primary/80 transition-colors">
                 <Settings className="w-5 h-5" />
               </button>
             </DropdownMenuTrigger>
             <DropdownMenuContent className="acrylic-light border-primary/30 text-white">
-              <DropdownMenuItem
-                className="cursor-pointer text-destructive hover:bg-destructive/20 hover:text-destructive/80 focus:bg-destructive/20 focus:text-destructive/80"
-                onClick={handleDeleteServer}
+              {/* Common options for all users */}              <DropdownMenuItem 
+                className="cursor-pointer hover:bg-primary/20 hover:text-white focus:bg-primary/20 focus:text-white"
+                onClick={handleInvitePeople}
               >
-                Delete Server
+                <UserPlus className="w-4 h-4 mr-2" />
+                Invite People
               </DropdownMenuItem>
+              
+              {/* Server owner specific options */}
+              {isServerOwner && (
+                <>                  <DropdownMenuItem 
+                    className="cursor-pointer hover:bg-primary/20 hover:text-white focus:bg-primary/20 focus:text-white"
+                    onClick={handleServerSettings}
+                  >
+                    <Settings className="w-4 h-4 mr-2" />
+                    Server Settings
+                  </DropdownMenuItem>
+                  <DropdownMenuItem 
+                    className="cursor-pointer hover:bg-primary/20 hover:text-white focus:bg-primary/20 focus:text-white"
+                    onClick={() => {
+                      setNewChannelData({ name: "", type: "text", private: false })
+                      setIsCreateChannelModalOpen(true)
+                    }}
+                  >
+                    <Plus className="w-4 h-4 mr-2" />
+                    Create Channel
+                  </DropdownMenuItem>                  <DropdownMenuItem 
+                    className="cursor-pointer hover:bg-primary/20 hover:text-white focus:bg-primary/20 focus:text-white"
+                    onClick={handleCreateCategory}
+                  >
+                    <Hash className="w-4 h-4 mr-2" />
+                    Create Category
+                  </DropdownMenuItem>
+                </>
+              )}
+              
+              {/* Common settings for all users */}              <DropdownMenuItem 
+                className="cursor-pointer hover:bg-primary/20 hover:text-white focus:bg-primary/20 focus:text-white"
+                onClick={handleNotificationSettings}
+              >
+                <Bell className="w-4 h-4 mr-2" />
+                Notification Settings
+              </DropdownMenuItem>              <DropdownMenuItem 
+                className="cursor-pointer hover:bg-primary/20 hover:text-white focus:bg-primary/20 focus:text-white"
+                onClick={handlePrivacySettings}
+              >
+                <Shield className="w-4 h-4 mr-2" />
+                Privacy Settings
+              </DropdownMenuItem>
+              
+              {/* Leave/Delete Server option */}
+              {isServerOwner ? (
+                <DropdownMenuItem
+                  className="cursor-pointer text-destructive hover:bg-destructive/20 hover:text-destructive/80 focus:bg-destructive/20 focus:text-destructive/80"
+                  onClick={handleDeleteServer}
+                >
+                  <Settings className="w-4 h-4 mr-2" />
+                  Delete Server
+                </DropdownMenuItem>
+              ) : (                <DropdownMenuItem 
+                  className="cursor-pointer text-destructive hover:bg-destructive/20 hover:text-destructive/80 focus:bg-destructive/20 focus:text-destructive/80"
+                  onClick={handleLeaveGuild}
+                >
+                  <LogOut className="w-4 h-4 mr-2" />
+                  Leave Guild
+                </DropdownMenuItem>
+              )}
             </DropdownMenuContent>
           </DropdownMenu>
         </div>
@@ -321,67 +434,7 @@ export default function ChannelSidebar() {  const router = useRouter()
                     )}
                   </div>
                 )
-              })}
-            </CollapsibleContent>
-          </Collapsible>
-
-          {/* Video Channels */}          <Collapsible open={categoryStates.video} className="mb-2">
-            <div className="flex items-center w-full">
-              <CollapsibleTrigger asChild>
-                <button
-                  type="button"
-                  className="flex items-center flex-1 text-xs font-semibold text-gray-400 hover:text-white py-1 px-1 cursor-pointer group hover:bg-accent/10 rounded-md transition-colors"
-                  onClick={() => toggleCategory("video")}
-                >
-                  {categoryStates.video ? (
-                    <ChevronDown className="w-3 h-3 mr-1 text-accent group-hover:text-accent" />
-                  ) : (
-                    <ChevronRight className="w-3 h-3 mr-1 text-accent group-hover:text-accent" />
-                  )}
-                  <span className="neon-text tracking-wider">VIDEO CHANNELS</span>
-                </button>
-              </CollapsibleTrigger>
-              <button
-                className="ml-auto text-gray-400 hover:text-accent transition-opacity"
-                onClick={(e) => {
-                  e.stopPropagation()
-                  setNewChannelData({ name: "", type: "video", private: false })
-                  setIsCreateChannelModalOpen(true)
-                }}
-              >
-                <Plus className="w-4 h-4" />
-              </button>
-            </div>
-            <CollapsibleContent className="space-y-0.5 mt-1">
-              {videoChannels.map((channel) => (
-                <div key={channel.id} className="group relative">
-                  <button                    className={cn(
-                      "flex items-center w-full rounded-md py-1 px-2 my-1 text-gray-400 hover:bg-accent/20 hover:text-white transition-colors",
-                      currentChannelId === channel.id && "bg-accent/30 text-white"
-                    )}
-                    onClick={() => setCurrentChannelId(channel.id)}
-                  >
-                    {getChannelIcon(channel.type)}
-                    <span className="truncate">{channel.name}</span>
-                    {channel.private && <Lock className="w-3 h-3 ml-1 opacity-70" />}
-                  </button>
-                  <DropdownMenu>
-                    <DropdownMenuTrigger asChild>
-                      <button className="absolute right-2 top-1/2 -translate-y-1/2 opacity-0 group-hover:opacity-100 text-gray-400 hover:text-white">
-                        <MoreVertical className="h-4 w-4" />
-                      </button>
-                    </DropdownMenuTrigger>
-                    <DropdownMenuContent className="acrylic-light border-accent/30 text-white">                      <DropdownMenuItem
-                        className="cursor-pointer text-destructive hover:bg-destructive/20 hover:text-destructive focus:bg-destructive/20 focus:text-destructive"
-                        onClick={() => handleDeleteChannel(channel.id)}
-                      >
-                        Delete Channel
-                      </DropdownMenuItem>
-                    </DropdownMenuContent>
-                  </DropdownMenu>
-                </div>
-              ))}
-            </CollapsibleContent>
+              })}            </CollapsibleContent>
           </Collapsible>
         </div>
       </div>
@@ -414,18 +467,11 @@ export default function ChannelSidebar() {  const router = useRouter()
                     <Hash className="w-4 h-4 mr-2 text-primary" />
                     Text Channel
                   </Label>
-                </div>
-                <div className="flex items-center space-x-2">
+                </div>                <div className="flex items-center space-x-2">
                   <RadioGroupItem value="voice" id="channel-type-voice" className="border-secondary/40 text-secondary" />
                   <Label htmlFor="channel-type-voice" className="flex items-center cursor-pointer">
                     <Volume2 className="w-4 h-4 mr-2 text-secondary" />
                     Voice Channel
-                  </Label>
-                </div>
-                <div className="flex items-center space-x-2">                  <RadioGroupItem value="video" id="channel-type-video" className="border-accent/40 text-accent" />
-                  <Label htmlFor="channel-type-video" className="flex items-center cursor-pointer">
-                    <Video className="w-4 h-4 mr-2 text-accent" />
-                    Video Channel
                   </Label>
                 </div>
               </RadioGroup>
