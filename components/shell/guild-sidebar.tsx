@@ -28,9 +28,8 @@ export default function GuildSidebar() {
 		setCurrentServerId(serverId)
 		router.push(`/guild/${serverId}`)
 	}
-
 	const handleDirectMessages = () => {
-		setCurrentServerId("") // Clear current server selection
+		setCurrentServerId(null) // Clear current server selection
 		router.push("/main")
 	}
 

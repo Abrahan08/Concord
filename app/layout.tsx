@@ -6,6 +6,7 @@ import { ThemeContextProvider } from "@/hooks/use-theme"
 import { Toaster } from "@/components/ui/toaster"
 import { AuthProvider } from "@/hooks/use-auth"
 import { ServerFunctionsProvider } from "@/hooks/use-server"
+import { ServerProvider } from "@/context/server-context"
 
 const inter = Inter({ subsets: ["latin"] })
 
@@ -25,12 +26,14 @@ export default function RootLayout({
       <body className={inter.className} suppressHydrationWarning>
         <AuthProvider>
           <ServerFunctionsProvider>
-            <ThemeProvider attribute="class" defaultTheme="neon" enableSystem={false} disableTransitionOnChange={false}>
-              <ThemeContextProvider>
-                {children}
-                <Toaster />
-              </ThemeContextProvider>
-            </ThemeProvider>
+            <ServerProvider>
+              <ThemeProvider attribute="class" defaultTheme="neon" enableSystem={false} disableTransitionOnChange={false}>
+                <ThemeContextProvider>
+                  {children}
+                  <Toaster />
+                </ThemeContextProvider>
+              </ThemeProvider>
+            </ServerProvider>
           </ServerFunctionsProvider>
         </AuthProvider>
       </body>

@@ -152,12 +152,10 @@ export default function ChannelSidebar() {
       description: "Invite functionality will be implemented soon.",
     })
   }
-
   const handleServerSettings = () => {
-    toast({
-      title: "Server Settings",
-      description: "Server settings panel will be implemented soon.",
-    })
+    if (currentServer) {
+      router.push(`/guild/${currentServer.id}/settings`)
+    }
   }
 
   const handleCreateCategory = () => {
