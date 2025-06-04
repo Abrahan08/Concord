@@ -154,16 +154,18 @@ export default function VoicePanel() {
           <div className="grid grid-cols-2 md:grid-cols-3 gap-6 mb-8 w-full max-w-3xl">
             {/* Current user */}
             <div className="flex flex-col items-center">
-              <div className={cn("relative mb-2", isMicOn && "animate-pulse")}>
-                <Avatar className="h-20 w-20">
-                  <AvatarImage
-                    src={currentUser?.avatar || "/placeholder.svg?height=100&amp;width=100"}
-                    alt={currentUser?.username || "You"}
-                  />
+              <div className={cn("relative mb-2", isMicOn && "animate-pulse")}>                <Avatar className="h-20 w-20">
+                  {/* Only show AvatarImage if we have a real avatar (not placeholder) */}
+                  {currentUser?.avatar && !currentUser.avatar.includes('placeholder') && !currentUser.avatar.includes('height=') && !currentUser.avatar.includes('width=') ? (
+                    <AvatarImage
+                      src={currentUser.avatar}
+                      alt={currentUser?.username || "You"}
+                    />
+                  ) : null}
                   <AvatarFallback className="bg-primary text-white text-xl">
                     {currentUser?.username.substring(0, 2).toUpperCase() || "Y"}
                   </AvatarFallback>
-                </Avatar>                {!isMicOn && (
+                </Avatar>{!isMicOn && (
                   <div className="absolute -bottom-1 -right-1 bg-destructive rounded-full p-1">
                     <MicOff className="h-4 w-4" />
                   </div>
@@ -181,16 +183,18 @@ export default function VoicePanel() {
             {/* Other participants */}
             {participants.map((participant) => (
               <div key={participant.id} className="flex flex-col items-center">
-                <div className={cn("relative mb-2", participant.isSpeaking && !participant.isMuted && "animate-pulse")}>
-                  <Avatar className="h-20 w-20">
-                    <AvatarImage
-                      src={participant.avatar || "/placeholder.svg?height=100&amp;width=100"}
-                      alt={participant.username}
-                    />
-                    <AvatarFallback className="bg-primary text-white text-xl">
-                      {participant.username.substring(0, 2).toUpperCase()}
-                    </AvatarFallback>
-                  </Avatar>                  {participant.isMuted && (
+                <div className={cn("relative mb-2", participant.isSpeaking && !participant.isMuted && "animate-pulse")}>                    <Avatar className="h-20 w-20">
+                      {/* Only show AvatarImage if we have a real avatar (not placeholder) */}
+                      {participant.avatar && !participant.avatar.includes('placeholder') && !participant.avatar.includes('height=') && !participant.avatar.includes('width=') ? (
+                        <AvatarImage
+                          src={participant.avatar}
+                          alt={participant.username}
+                        />
+                      ) : null}
+                      <AvatarFallback className="bg-primary text-white text-xl">
+                        {participant.username.substring(0, 2).toUpperCase()}
+                      </AvatarFallback>
+                    </Avatar>{participant.isMuted && (
                     <div className="absolute -bottom-1 -right-1 bg-destructive rounded-full p-1">
                       <MicOff className="h-4 w-4" />
                     </div>

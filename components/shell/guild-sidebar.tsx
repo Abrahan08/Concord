@@ -141,13 +141,14 @@ export default function GuildSidebar() {
 											<div className="flex items-center space-x-2 text-gray-300">
 												<Volume2 className="h-4 w-4 text-green-400" />
 												<span className="text-sm">Voice Chat ({mockVoiceUsers.length})</span>
-											</div>
-
-											<div className="flex flex-wrap gap-1">
+											</div>											<div className="flex flex-wrap gap-1">
 												{mockVoiceUsers.slice(0, 6).map((user) => (
 													<div key={user.id} className="relative">
 														<Avatar className="w-6 h-6">
-															<AvatarImage src={user.avatar} alt={user.username} />
+															{/* Only show AvatarImage if we have a real avatar (not placeholder) */}
+															{user.avatar && !user.avatar.includes('placeholder') && !user.avatar.includes('height=') && !user.avatar.includes('width=') ? (
+																<AvatarImage src={user.avatar} alt={user.username} />
+															) : null}
 															<AvatarFallback className="text-xs bg-gray-600">
 																{user.username.substring(0, 1).toUpperCase()}
 															</AvatarFallback>

@@ -47,12 +47,14 @@ export default function VideoPanel() {
               </div>
             </div>
           ) : (
-            <div className="flex flex-col items-center justify-center">
-              <Avatar className="h-24 w-24 mb-4">
-                <AvatarImage
-                  src={currentUser?.avatar || "/placeholder.svg?height=100&width=100"}
-                  alt={currentUser?.username || "You"}
-                />
+            <div className="flex flex-col items-center justify-center">              <Avatar className="h-24 w-24 mb-4">
+                {/* Only show AvatarImage if we have a real avatar (not placeholder) */}
+                {currentUser?.avatar && !currentUser.avatar.includes('placeholder') && !currentUser.avatar.includes('height=') && !currentUser.avatar.includes('width=') ? (
+                  <AvatarImage
+                    src={currentUser.avatar}
+                    alt={currentUser?.username || "You"}
+                  />
+                ) : null}
                 <AvatarFallback className="bg-primary text-white text-2xl">
                   {currentUser?.username.substring(0, 2).toUpperCase() || "Y"}
                 </AvatarFallback>
@@ -72,12 +74,14 @@ export default function VideoPanel() {
             key={participant.id}
             className="aspect-video bg-gray-800 rounded-lg overflow-hidden relative flex items-center justify-center"
           >
-            <div className="flex flex-col items-center justify-center">
-              <Avatar className="h-16 w-16 mb-2">
-                <AvatarImage
-                  src={participant.avatar || "/placeholder.svg?height=100&width=100"}
-                  alt={participant.username}
-                />
+            <div className="flex flex-col items-center justify-center">              <Avatar className="h-16 w-16 mb-2">
+                {/* Only show AvatarImage if we have a real avatar (not placeholder) */}
+                {participant.avatar && !participant.avatar.includes('placeholder') && !participant.avatar.includes('height=') && !participant.avatar.includes('width=') ? (
+                  <AvatarImage
+                    src={participant.avatar}
+                    alt={participant.username}
+                  />
+                ) : null}
                 <AvatarFallback className="bg-primary text-white">
                   {participant.username.substring(0, 2).toUpperCase()}
                 </AvatarFallback>

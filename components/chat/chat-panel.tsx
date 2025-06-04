@@ -55,13 +55,18 @@ export default function ChatPanel() {
     <div className="flex-1 flex flex-col">
       <div className="flex-1 overflow-y-auto p-4">
         <div className="space-y-4">
-          {channelMessages.map((message) => (
-            <div key={message.id} className="flex items-start group">
+          {channelMessages.map((message) => (            <div key={message.id} className="flex items-start group">
               <Avatar className="h-10 w-10 mr-3 mt-0.5">
-                <AvatarImage
-                  src={message.user?.avatar || "/placeholder.svg?height=100&width=100"}
-                  alt={message.user?.username || "User"}
-                />                <AvatarFallback className="bg-primary text-primary-foreground">
+                {message.user?.avatar && 
+                 !message.user.avatar.includes('placeholder') && 
+                 !message.user.avatar.includes('height=') && 
+                 !message.user.avatar.includes('width=') && (
+                  <AvatarImage
+                    src={message.user.avatar}
+                    alt={message.user?.username || "User"}
+                  />
+                )}
+                <AvatarFallback className="bg-primary text-primary-foreground">
                   {message.user?.username.substring(0, 2).toUpperCase() || "U"}
                 </AvatarFallback>
               </Avatar>

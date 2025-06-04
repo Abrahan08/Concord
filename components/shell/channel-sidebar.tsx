@@ -279,10 +279,12 @@ export default function ChannelSidebar() {  const router = useRouter()
                     {deduplicatedUsers.length > 0 && (
                       <div className="flex flex-col gap-1 mt-1 ml-6">
                         {deduplicatedUsers.map((user: any) => (
-                          <div key={`voice-${channel.id}-${user.id}`} className="group/user relative">
-                            <div className="flex items-center gap-2 py-1 px-2 rounded-md hover:bg-secondary/20 transition-colors">
+                          <div key={`voice-${channel.id}-${user.id}`} className="group/user relative">                            <div className="flex items-center gap-2 py-1 px-2 rounded-md hover:bg-secondary/20 transition-colors">
                               <Avatar className="w-6 h-6">
-                                <AvatarImage src={user.avatar || "/placeholder.svg?height=100&width=100"} alt={user.username} />
+                                {/* Only show AvatarImage if we have a real avatar (not placeholder) */}
+                                {user.avatar && !user.avatar.includes('placeholder') && !user.avatar.includes('height=') && !user.avatar.includes('width=') ? (
+                                  <AvatarImage src={user.avatar} alt={user.username} />
+                                ) : null}
                                 <AvatarFallback>{user.username.substring(0, 2).toUpperCase()}</AvatarFallback>
                               </Avatar>
                               <span className="text-xs text-white flex-1">{user.username}</span>
