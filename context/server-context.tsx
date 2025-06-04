@@ -49,7 +49,6 @@ export function ServerProvider({ children }: { children: ReactNode }) {
       id: "4",
       name: "Book Club",
     },  ]
-
   const [servers, setServers] = useState<Server[]>(() => {
     // Initialize servers from localStorage on first load
     if (typeof window !== 'undefined') {
@@ -65,7 +64,7 @@ export function ServerProvider({ children }: { children: ReactNode }) {
     // Return default servers if no stored data or error
     return defaultServers
   })
-  const [currentServerId, setCurrentServerId] = useState<string | null>("1")
+  const [currentServerId, setCurrentServerId] = useState<string | null>(null)
 
   const handleSetCurrentServerId = (id: string) => {
     // Treat empty string as null
